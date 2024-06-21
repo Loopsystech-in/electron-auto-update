@@ -3,10 +3,9 @@ name: Publish Release
 on:
   push:
     tags:
-      - '*.*.*'
+      - '*'
 
 jobs:
-
   publish:
     needs: build-and-tag
     runs-on: windows-latest
