@@ -7,7 +7,6 @@ on:
 
 jobs:
   publish:
-    needs: build-and-tag
     runs-on: windows-latest
 
     steps:
