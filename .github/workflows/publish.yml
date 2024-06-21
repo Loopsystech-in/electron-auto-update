@@ -38,10 +38,9 @@ jobs:
         echo ::set-output name=new_version::$NEW_VERSION
 
     - name: Push changes and tags
-      env:
-        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
-        git push origin HEAD:master --follow-tags
+        git tag ${{ steps.tag.output.new_version }}
+        git push origin ${{ steps.tag.output.new_version }}
 
   publish:
     needs: build-and-tag
