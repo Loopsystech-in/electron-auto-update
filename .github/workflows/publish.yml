@@ -1,0 +1,67 @@
+name: Generate Tag and Publish Release
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-tag:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Get current version
+      id: vars
+      run: echo ::set-output name=version::$(node -p "require('./package.json').version")
+
+    - name: Bump version and create tag
+      id: tag
+      run: |
+        NEW_VERSION=$(npm version patch)
+        echo "New version: $NEW_VERSION"
+        echo ::set-output name=new_version::$NEW_VERSION
+
+    - name: Push changes and tags
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git config --global user.name 'github-actions'
+        git config --global user.email 'github-actions@github.com'
+        git push origin HEAD:master --follow-tags
+
+  publish:
+    needs: build-and-tag
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Install electron-builder
+      run: npm install electron-builder --save-dev
+
+    - name: Build and publish
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: npm run publish
