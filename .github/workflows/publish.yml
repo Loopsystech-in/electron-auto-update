@@ -42,3 +42,32 @@ jobs:
     - name: Push changes and tags
       run: |
         git push origin HEAD:master --follow-tags
+
+  publish:
+    needs: build-and-tag
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+
+    - name: Git tags
+      run: git tag
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Install electron-builder
+      run: npm install electron-builder --save-dev
+
+    - name: Build and publish
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      run: npm run publish
