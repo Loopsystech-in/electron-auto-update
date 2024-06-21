@@ -1,0 +1,32 @@
+name: Generate Tag and Publish Release
+
+on:
+  push:
+    tags:
+      - '*.*.*'
+
+jobs:
+
+  publish:
+    needs: build-and-tag
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Install electron-builder
+      run: npm install electron-builder --save-dev
+
+    - name: Build and publish
+      run: npm run publish
