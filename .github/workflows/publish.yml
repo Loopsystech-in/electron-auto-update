@@ -41,8 +41,7 @@ jobs:
 
     - name: Push changes and tags
       run: |
-        git tag ${{ steps.tag.output.new_version }}
-        git push origin ${{ steps.tag.output.new_version }}
+        git push origin HEAD:master --follow-tags
 
   publish:
     needs: build-and-tag
